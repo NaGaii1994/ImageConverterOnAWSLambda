@@ -1,0 +1,27 @@
+version: '3'
+
+volumes:
+  localstack_data: {}
+
+services:
+  lambda:
+    build:
+      context: .
+      dockerfile: ./compose/dev/lambda/Dockerfile
+    volumes:
+      - .:/workspace:cached
+    command: sleep infinity
+    depends_on:
+      - localstack
+
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      - DEBUG=${DEBUG-}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - localstack_data:/var/lib/localstack:z
+      - /var/run/docker.sock:/var/run/docker.sock
