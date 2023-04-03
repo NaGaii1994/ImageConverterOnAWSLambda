@@ -51,3 +51,18 @@ def test_convert_image_to_webp_with_upload_webp_or_other_file(setup):
     result = main.convert_image_to_webp("0.webp")
     assert result is None
     setup.delete_object(Bucket=main.BUCKET_NAME, Key="0.webp")
+
+
+def test_convert_image_to_webp_with_upload_broken_image_file(setup):
+    main.s3_client = setup
+
+    transfer = S3Transfer(setup)
+    transfer.upload_file(
+        "sample/broken_image.jpg",
+        main.BUCKET_NAME,
+        "broken_image.jpg",
+    )
+
+    result = main.convert_image_to_webp("broken_image.jpg")
+    assert result is None
+    setup.delete_object(Bucket=main.BUCKET_NAME, Key="broken_image.jpg")

@@ -3,7 +3,7 @@ import json
 import os
 
 import boto3
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 # バケット名,オブジェクト名
 BUCKET_NAME = "test-backet"
@@ -37,16 +37,21 @@ def convert_image_to_webp(key):
     if ext in ["jpg", "jpeg", "gif", "png"]:
         s3_object = s3_client.get_object(Bucket=BUCKET_NAME, Key=key)
         image_data = io.BytesIO(s3_object["Body"].read())
-        pil_image = Image.open(image_data)
+        try:
+            pil_image = Image.open(image_data)
 
-        # Save to memory
-        buffer = io.BytesIO()
-        pil_image.save(buffer, "WebP")
+            # Save to memory
+            buffer = io.BytesIO()
+            pil_image.save(buffer, "WebP")
 
-        new_key = os.path.splitext(key)[0] + ".webp"
+            new_key = os.path.splitext(key)[0] + ".webp"
 
-        s3_client.put_object(
-            Bucket=BUCKET_NAME,
-            Key=new_key,
-            Body=buffer.getvalue(),
-        )
+            s3_client.put_object(
+                Bucket=BUCKET_NAME,
+                Key=new_key,
+                Body=buffer.getvalue(),
+            )
+
+        except UnidentifiedImageError:
+            print(f"{BUCKET_NAME}:{key} is not image file. It may be broken.")
+            return None
