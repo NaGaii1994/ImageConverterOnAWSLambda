@@ -31,3 +31,23 @@ def test_list_backet_images(setup):
     assert "2.jpg" in main.list_backet_images()
     assert "3.jpg" in main.list_backet_images()
     assert "4.jpg" in main.list_backet_images()
+
+
+def test_convert_image_to_webp(setup):
+    main.s3_client = setup
+
+    main.convert_image_to_webp("0.jpg")
+    webp = setup.get_object(Bucket=main.BUCKET_NAME, Key="0.webp")
+    assert webp is not None
+    setup.delete_object(Bucket=main.BUCKET_NAME, Key="0.webp")
+
+
+def test_convert_image_to_webp_with_upload_webp_or_other_file(setup):
+    main.s3_client = setup
+
+    transfer = S3Transfer(setup)
+    transfer.upload_file("sample/0.webp", main.BUCKET_NAME, "0.webp")
+
+    result = main.convert_image_to_webp("0.webp")
+    assert result is None
+    setup.delete_object(Bucket=main.BUCKET_NAME, Key="0.webp")
