@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  linter:
+  build:
     runs-on: ubuntu-latest
     steps:
 
@@ -29,5 +29,18 @@ jobs:
           cache-dependency-path: |
             requirements.txt
 
+      - run: pip install -r requirements.txt
+
       - name: Run pre-commit
         uses: pre-commit/action@v2.0.3
+
+      - name: Unit Test
+        env:
+          DEFAULT_REGION: ap-northeast-1
+          AWS_ACCOUNT_ID: "000000000000"
+          AWS_ACCESS_KEY_ID: dummy-access-key
+          AWS_SECRET_ACCESS_KEY: dummy-secret-key
+          AWS_ENDPOINT_URL: "http://localhost:4566"
+        run: |
+          docker-compose -f docker-compose.ci.yml up -d
+          cd lambda && pytest

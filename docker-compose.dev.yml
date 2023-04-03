@@ -8,6 +8,8 @@ services:
     build:
       context: .
       dockerfile: ./compose/dev/lambda/Dockerfile
+    environment:
+      - AWS_ENDPOINT_URL=http://localstack:4566
     volumes:
       - .:/workspace:cached
     command: sleep infinity
