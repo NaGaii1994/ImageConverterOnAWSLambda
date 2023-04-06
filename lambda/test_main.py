@@ -12,6 +12,7 @@ from boto3.s3.transfer import S3Transfer
 def setup():
     client = boto3.client("s3", endpoint_url=os.getenv("AWS_ENDPOINT_URL"))
     print("create s3 backet...")
+    main.BUCKET_NAME = "test-bucket"
     client.create_bucket(Bucket=main.BUCKET_NAME)
     transfer = S3Transfer(client)
     for i in range(5):
