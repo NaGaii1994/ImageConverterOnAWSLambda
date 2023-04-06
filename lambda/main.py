@@ -1,21 +1,22 @@
 import io
-import json
 import os
+import urllib.parse
 
 import boto3
 from PIL import Image, UnidentifiedImageError
 
 # バケット名,オブジェクト名
-BUCKET_NAME = "test-backet"
+BUCKET_NAME = "s3-bucket-for-image-upload"
 
 s3_client = boto3.client("s3")
 
 
 def lambda_handler(event, context):
-    response = s3_client.get_object(Bucket=BUCKET_NAME)
-    body = response["Body"].read()
-
-    return json.loads(body.decode("utf-8"))
+    # Get the object from the event and show its content type
+    key = urllib.parse.unquote_plus(
+        event["Records"][0]["s3"]["object"]["key"], encoding="utf-8"
+    )
+    convert_image_to_webp(key)
 
 
 def list_backet_images():
