@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: S3 bucket for web services etc...
+
+Parameters:
+  NameOfLambdaCodeS3Bucket:
+    Description: Type of this BacketName.
+    Type: String
+
+Resources:
+  LambdaCodeS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${NameOfLambdaCodeS3Bucket}
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+
+Outputs:
+  S3BucketName:
+    Value: !Ref LambdaCodeS3Bucket
