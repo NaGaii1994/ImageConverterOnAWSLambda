@@ -34,6 +34,7 @@ def list_backet_images():
 def convert_image_to_webp(key):
     # Detect extension
     ext = os.path.splitext(key)[1][1:]
+    print(f"converting {key} to webp...")
 
     if ext in ["jpg", "jpeg", "gif", "png"]:
         s3_object = s3_client.get_object(Bucket=BUCKET_NAME, Key=key)
@@ -47,6 +48,7 @@ def convert_image_to_webp(key):
 
             new_key = os.path.splitext(key)[0] + ".webp"
 
+            print(f"Uploading {new_key} to S3 Bucket {BUCKET_NAME}...")
             s3_client.put_object(
                 Bucket=BUCKET_NAME,
                 Key=new_key,
