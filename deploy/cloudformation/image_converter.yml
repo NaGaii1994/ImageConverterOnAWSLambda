@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "This cloudformation code creates an S3 bucket that is used to store images. It also provisions a Lambda function that is triggered by an image upload event and is responsible for converting the images."
+Parameters:
+  NameOfLambdaCodeS3Bucket:
+    Description: Name of the S3 bucket used to upload lambda function as zip.
+    Type: String
+
+  NameOfImageStorageS3Bucket:
+    Description: Name of the S3 bucket used to upload images and trigger a Lambda function that processes them.
+    Type: String
+
+  NameOfImageConverterLambdaFunction:
+    Description: Name of the lambda function converting images.
+    Type: String
+
+Resources:
+  ImageConverterLambdaFunctionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        - "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+      RoleName: "image_converter_lambda_function_role"
+
+  ImageConverterLambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Code:
+        S3Bucket: !Sub ${NameOfLambdaCodeS3Bucket}
+        S3Key: "bootstrap.zip"
+      FunctionName: !Sub ${NameOfImageConverterLambdaFunction}
+      Handler: "main.lambda_handler"
+      MemorySize: 128
+      Role: !GetAtt "ImageConverterLambdaFunctionRole.Arn"
+      Runtime: "python3.9"
+      Timeout: 5
+
+  ImageConverterLambdaFunctionPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt
+        - ImageConverterLambdaFunction
+        - Arn
+      Principal: "s3.amazonaws.com"
+      SourceArn: !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Sub ${NameOfImageStorageS3Bucket}
+
+  ImageStorageS3Bucket:
+    Type: "AWS::S3::Bucket"
+    DependsOn: "ImageConverterLambdaFunctionPermission"
+    Properties:
+      BucketName: !Sub ${NameOfImageStorageS3Bucket}
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: jpg
+            Function: !GetAtt
+              - ImageConverterLambdaFunction
+              - Arn
