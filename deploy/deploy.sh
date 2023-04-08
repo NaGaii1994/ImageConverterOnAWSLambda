@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 StackNameOfLambdaCodeS3Bucket="stack-for-s3-bucket-for-lambda-deploy"
 NameOfLambdaCodeS3Bucket="s3-bucket-for-lambda-deploy"
 
