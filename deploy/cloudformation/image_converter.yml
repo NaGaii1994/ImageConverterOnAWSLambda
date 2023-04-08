@@ -73,3 +73,84 @@ Resources:
             Function: !GetAtt
               - ImageConverterLambdaFunction
               - Arn
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: JPG
+            Function: !GetAtt
+              - ImageConverterLambdaFunction
+              - Arn
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: jpeg
+            Function: !GetAtt
+              - ImageConverterLambdaFunction
+              - Arn
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: JPEG
+            Function: !GetAtt
+              - ImageConverterLambdaFunction
+              - Arn
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: png
+            Function: !GetAtt
+              - ImageConverterLambdaFunction
+              - Arn
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: PNG
+            Function: !GetAtt
+              - ImageConverterLambdaFunction
+              - Arn
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: gif
+            Function: !GetAtt
+              - ImageConverterLambdaFunction
+              - Arn
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: GIF
+            Function: !GetAtt
+              - ImageConverterLambdaFunction
+              - Arn
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: bmp
+            Function: !GetAtt
+              - ImageConverterLambdaFunction
+              - Arn
+          - Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: BMP
+            Function: !GetAtt
+              - ImageConverterLambdaFunction
+              - Arn

@@ -36,7 +36,18 @@ def convert_image_to_webp(key):
     ext = os.path.splitext(key)[1][1:]
     print(f"converting {key} to webp...")
 
-    if ext in ["jpg", "jpeg", "gif", "png"]:
+    if ext in [
+        "jpg",
+        "JPG",
+        "jpeg",
+        "JPEG",
+        "gif",
+        "GIF",
+        "png",
+        "PNG",
+        "bmp",
+        "BMP",
+    ]:
         s3_object = s3_client.get_object(Bucket=BUCKET_NAME, Key=key)
         image_data = io.BytesIO(s3_object["Body"].read())
         try:
