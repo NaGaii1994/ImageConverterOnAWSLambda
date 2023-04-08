@@ -43,4 +43,4 @@ jobs:
           AWS_ENDPOINT_URL: "http://localhost:4566"
         run: |
           docker-compose -f docker-compose.ci.yml up -d
-          cd lambda && pytest
+          make test
