@@ -1,5 +1,7 @@
 # Image Converter on AWS Lambda
 
+[日本語版 README はこちら](https://github.com/NaGaii1994/ImageConverterOnAWSLambda/blob/main/README-ja.md)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Introduction
