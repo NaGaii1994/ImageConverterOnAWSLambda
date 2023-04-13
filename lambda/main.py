@@ -6,7 +6,7 @@ import boto3
 from PIL import Image, UnidentifiedImageError
 
 # バケット名,オブジェクト名
-BUCKET_NAME = "s3-bucket-for-image-upload"
+BUCKET_NAME = os.getenv("IMAGE_STORAGE_S3_BUCKET")
 
 s3_client = boto3.client("s3")
 
