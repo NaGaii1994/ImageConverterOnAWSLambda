@@ -11,9 +11,13 @@ from boto3.s3.transfer import S3Transfer
 @pytest.fixture
 def setup():
     client = boto3.client("s3", endpoint_url=os.getenv("AWS_ENDPOINT_URL"))
+    region_name = os.getenv("AWS_DEFAULT_REGION")
     print("create s3 backet...")
     main.BUCKET_NAME = "test-bucket"
-    client.create_bucket(Bucket=main.BUCKET_NAME)
+    client.create_bucket(
+        Bucket=main.BUCKET_NAME,
+        CreateBucketConfiguration={"LocationConstraint": region_name},
+    )
     transfer = S3Transfer(client)
     for i in range(5):
         transfer.upload_file(f"sample/{i}.jpg", main.BUCKET_NAME, f"{i}.jpg")
