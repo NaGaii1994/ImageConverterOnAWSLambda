@@ -43,6 +43,9 @@ Resources:
       Role: !GetAtt "ImageConverterLambdaFunctionRole.Arn"
       Runtime: "python3.9"
       Timeout: 30
+      Environment:
+        Variables:
+          IMAGE_STORAGE_S3_BUCKET: !Sub ${NameOfImageStorageS3Bucket}
 
   ImageConverterLambdaFunctionPermission:
     Type: "AWS::Lambda::Permission"
