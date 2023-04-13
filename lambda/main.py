@@ -19,18 +19,6 @@ def lambda_handler(event, context):
     convert_image_to_webp(key)
 
 
-def list_backet_images():
-    keys = []
-    for obj in s3_client.list_objects(Bucket=BUCKET_NAME)["Contents"]:
-        keys.append(obj["Key"])
-        print(
-            obj["Key"],
-            obj["Size"],
-            obj["LastModified"].strftime("%Y/%m/%d %H:%M:%S"),
-        )
-    return keys
-
-
 def convert_image_to_webp(key):
     # Detect extension
     ext = os.path.splitext(key)[1][1:]
