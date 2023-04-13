@@ -14,6 +14,7 @@ def setup():
     region_name = os.getenv("AWS_DEFAULT_REGION")
     print("create s3 backet...")
     main.BUCKET_NAME = "test-bucket"
+    main.s3_client = client
     client.create_bucket(
         Bucket=main.BUCKET_NAME,
         CreateBucketConfiguration={"LocationConstraint": region_name},
@@ -28,8 +29,6 @@ def setup():
 
 
 def test_convert_image_to_webp(setup):
-    main.s3_client = setup
-
     main.convert_image_to_webp("0.jpg")
     webp = setup.get_object(Bucket=main.BUCKET_NAME, Key="0.webp")
     assert webp is not None
@@ -37,8 +36,6 @@ def test_convert_image_to_webp(setup):
 
 
 def test_convert_image_to_webp_with_upload_webp_or_other_file(setup):
-    main.s3_client = setup
-
     transfer = S3Transfer(setup)
     transfer.upload_file("sample/0.webp", main.BUCKET_NAME, "0.webp")
 
@@ -48,8 +45,6 @@ def test_convert_image_to_webp_with_upload_webp_or_other_file(setup):
 
 
 def test_convert_image_to_webp_with_upload_broken_image_file(setup):
-    main.s3_client = setup
-
     transfer = S3Transfer(setup)
     transfer.upload_file(
         "sample/broken_image.jpg",
