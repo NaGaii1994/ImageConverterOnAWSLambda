@@ -8,13 +8,33 @@ import pytest
 from boto3.s3.transfer import S3Transfer
 
 
+def cleanup_s3_bucket(client):
+    print("cleaning up before testing...")
+    try:
+        list_objects = client.list_objects(Bucket=main.BUCKET_NAME)
+        try:
+            for obj in list_objects["Contents"]:
+                print(
+                    "Deleting object {} on '{}' s3 bucket".format(
+                        obj["Key"], main.BUCKET_NAME
+                    )
+                )
+                client.delete_object(Bucket=main.BUCKET_NAME, Key=obj["Key"])
+        except KeyError:
+            pass
+        client.delete_bucket(Bucket=main.BUCKET_NAME)
+    except client.exceptions.NoSuchBucket:
+        print("Do nothing to cleanup.")
+
+
 @pytest.fixture
 def test_client():
     client = boto3.client("s3", endpoint_url=os.getenv("AWS_ENDPOINT_URL"))
     region_name = os.getenv("AWS_DEFAULT_REGION")
-    print("create s3 backet...")
     main.BUCKET_NAME = "test-bucket"
     main.s3_client = client
+    cleanup_s3_bucket(client)
+    print("create s3 backet...")
     client.create_bucket(
         Bucket=main.BUCKET_NAME,
         CreateBucketConfiguration={"LocationConstraint": region_name},
