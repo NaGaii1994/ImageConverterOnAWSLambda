@@ -2,11 +2,10 @@
 
 set -eu
 
-StackNameOfLambdaCodeS3Bucket="stack-for-s3-bucket-for-lambda-deploy"
+source ./config
+
 NameOfLambdaCodeS3Bucket="s3-bucket-for-lambda-deploy"
 
-
-StackNameOfLambdaCode="stack-for-image-converter"
 NameOfImageStorageS3Bucket="s3-bucket-for-image-upload"
 NameOfImageConverterLambdaFunction="image-converter-lambda"
 
