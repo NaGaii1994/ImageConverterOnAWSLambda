@@ -9,6 +9,8 @@ NameOfLambdaCodeS3Bucket="s3-bucket-for-lambda-deploy"
 NameOfImageStorageS3Bucket="s3-bucket-for-image-upload"
 NameOfImageConverterLambdaFunction="image-converter-lambda"
 
+EnvironmentType="ci"
+
 # テンプレートの実行
 aws cloudformation deploy \
     --stack-name ${StackNameOfLambdaCodeS3Bucket} \
@@ -39,4 +41,5 @@ aws cloudformation deploy \
     NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket} \
     NameOfImageStorageS3Bucket=${NameOfImageStorageS3Bucket} \
     NameOfImageConverterLambdaFunction=${NameOfImageConverterLambdaFunction} \
+    EnvironmentType=${EnvironmentType} \
     --capabilities CAPABILITY_NAMED_IAM

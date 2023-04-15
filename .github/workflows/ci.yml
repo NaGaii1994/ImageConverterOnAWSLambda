@@ -47,3 +47,14 @@ jobs:
       - name: Cloudformation validation
         run: |
           find deploy -name "*.yml" -exec awslocal cloudformation validate-template --template-body file://{} \;
+      - name: E2E Test by localstack
+        env:
+          AWS_DEFAULT_REGION: ap-northeast-1
+          AWS_ACCOUNT_ID: "000000000000"
+          AWS_ACCESS_KEY_ID: dummy-access-key
+          AWS_SECRET_ACCESS_KEY: dummy-secret-key
+          AWS_ENDPOINT_URL: "http://localhost:4566"
+        run: |
+          sed -i 's/aws /awslocal /g' ./deploy/deploy.sh
+          make deploy
+          python deploy/e2e_test.py
