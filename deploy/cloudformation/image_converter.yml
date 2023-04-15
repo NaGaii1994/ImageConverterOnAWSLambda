@@ -13,6 +13,26 @@ Parameters:
     Description: Name of the lambda function converting images.
     Type: String
 
+  EnvironmentType:
+    Description: The environment type
+    Type: String
+    Default: local
+    AllowedValues:
+      - local
+      - ci
+      - prod
+    ConstraintDescription: must be a local, ci or prod
+
+Mappings:
+  ImageConverterLambdaFunctionMap:
+    local:
+      "AwsEndPointUrl": "http://localstack:4566"
+    ci:
+      "AwsEndPointUrl": "http://localstack:4566"
+    prod:
+      "AwsEndPointUrl": ""
+
+
 Resources:
   ImageConverterLambdaFunctionRole:
     Type: "AWS::IAM::Role"
@@ -46,6 +66,7 @@ Resources:
       Environment:
         Variables:
           IMAGE_STORAGE_S3_BUCKET: !Sub ${NameOfImageStorageS3Bucket}
+          AWS_ENDPOINT_URL: !FindInMap [ImageConverterLambdaFunctionMap, !Ref EnvironmentType, AwsEndPointUrl]
 
   ImageConverterLambdaFunctionPermission:
     Type: "AWS::Lambda::Permission"

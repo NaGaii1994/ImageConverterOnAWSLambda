@@ -9,6 +9,9 @@ from PIL import Image, UnidentifiedImageError
 BUCKET_NAME = os.getenv("IMAGE_STORAGE_S3_BUCKET")
 
 s3_client = boto3.client("s3")
+if os.getenv("AWS_ENDPOINT_URL"):
+    print("aws endpoint is {}".format(os.getenv("AWS_ENDPOINT_URL")))
+    s3_client = boto3.client("s3", endpoint_url=os.getenv("AWS_ENDPOINT_URL"))
 
 
 def lambda_handler(event, context):
