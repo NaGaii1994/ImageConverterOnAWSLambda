@@ -56,5 +56,5 @@ jobs:
           AWS_ENDPOINT_URL: "http://localhost:4566"
         run: |
           sed -i 's/aws /awslocal /g' ./deploy/deploy.sh
-          make deploy
+          make deploy_ci
           python deploy/e2e_test.py
