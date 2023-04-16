@@ -9,15 +9,40 @@ NameOfLambdaCodeS3Bucket="s3-bucket-for-lambda-deploy"
 NameOfImageStorageS3Bucket="s3-bucket-for-image-upload"
 NameOfImageConverterLambdaFunction="image-converter-lambda"
 
-EnvironmentType="ci"
+if [ $# -ne 1 ]
+then
+    echo "Usage: $0 local|ci|prod"
+    exit 1
+fi
 
-# テンプレートの実行
-aws cloudformation deploy \
-    --stack-name ${StackNameOfLambdaCodeS3Bucket} \
-    --template-file ./cloudformation/s3_bucket_for_image_converter_code.yml \
-    --parameter-overrides \
-    NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket}
+EnvironmentType=$1
 
+case $1 in
+    "local")
+        # テンプレートの実行
+        aws cloudformation deploy \
+            --stack-name ${StackNameOfLambdaCodeS3Bucket} \
+            --template-file ./cloudformation/s3_bucket_for_image_converter_code.yml \
+            --parameter-overrides \
+            NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket} \
+            --endpoint-url=http://localstack:4566
+        ;;
+    "ci")
+        aws cloudformation deploy \
+            --stack-name ${StackNameOfLambdaCodeS3Bucket} \
+            --template-file ./cloudformation/s3_bucket_for_image_converter_code.yml \
+            --parameter-overrides \
+            NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket} \
+            --endpoint-url=http://localhost:4566
+        ;;
+    "prod")
+        aws cloudformation deploy \
+            --stack-name ${StackNameOfLambdaCodeS3Bucket} \
+            --template-file ./cloudformation/s3_bucket_for_image_converter_code.yml \
+            --parameter-overrides \
+            NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket}
+        ;;
+esac
 cp -r ../lambda bootstrap
 pip install --requirement ./bootstrap/requirements/prod.txt \
     --platform manylinux2014_x86_64 \
@@ -30,16 +55,53 @@ cd bootstrap && zip -r ../bootstrap.zip .
 cd ..
 rm -r -f ./bootstrap
 
-aws s3 mv \
-    ./bootstrap.zip \
-    s3://${NameOfLambdaCodeS3Bucket}/bootstrap.zip
+case $1 in
+    "local")
+        aws s3 mv \
+            ./bootstrap.zip \
+            s3://${NameOfLambdaCodeS3Bucket}/bootstrap.zip \
+            --endpoint-url=http://localstack:4566
 
-aws cloudformation deploy \
-    --stack-name ${StackNameOfLambdaCode} \
-    --template-file ./cloudformation/image_converter.yml \
-    --parameter-overrides \
-    NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket} \
-    NameOfImageStorageS3Bucket=${NameOfImageStorageS3Bucket} \
-    NameOfImageConverterLambdaFunction=${NameOfImageConverterLambdaFunction} \
-    EnvironmentType=${EnvironmentType} \
-    --capabilities CAPABILITY_NAMED_IAM
+        aws cloudformation deploy \
+            --stack-name ${StackNameOfLambdaCode} \
+            --template-file ./cloudformation/image_converter.yml \
+            --parameter-overrides \
+            NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket} \
+            NameOfImageStorageS3Bucket=${NameOfImageStorageS3Bucket} \
+            NameOfImageConverterLambdaFunction=${NameOfImageConverterLambdaFunction} \
+            EnvironmentType=${EnvironmentType} \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --endpoint-url=http://localstack:4566
+            ;;
+    "ci")
+        aws s3 mv \
+            ./bootstrap.zip \
+            s3://${NameOfLambdaCodeS3Bucket}/bootstrap.zip \
+            --endpoint-url=http://localhost:4566
+
+        aws cloudformation deploy \
+            --stack-name ${StackNameOfLambdaCode} \
+            --template-file ./cloudformation/image_converter.yml \
+            --parameter-overrides \
+            NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket} \
+            NameOfImageStorageS3Bucket=${NameOfImageStorageS3Bucket} \
+            NameOfImageConverterLambdaFunction=${NameOfImageConverterLambdaFunction} \
+            EnvironmentType=${EnvironmentType} \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --endpoint-url=http://localhost:4566
+            ;;
+    "prod")
+        aws s3 mv \
+            ./bootstrap.zip \
+            s3://${NameOfLambdaCodeS3Bucket}/bootstrap.zip
+
+        aws cloudformation deploy \
+            --stack-name ${StackNameOfLambdaCode} \
+            --template-file ./cloudformation/image_converter.yml \
+            --parameter-overrides \
+            NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket} \
+            NameOfImageStorageS3Bucket=${NameOfImageStorageS3Bucket} \
+            NameOfImageConverterLambdaFunction=${NameOfImageConverterLambdaFunction} \
+            EnvironmentType=${EnvironmentType} \
+            --capabilities CAPABILITY_NAMED_IAM
+esac
