@@ -2,12 +2,12 @@ name: CI
 
 on:
   pull_request:
-    branches: [ "master", "main" ]
-    paths-ignore: [ "docs/**", "README*" ]
+    branches: ['master', 'main']
+    paths-ignore: ['docs/**', 'README*']
 
   push:
-    branches: [ "master", "main" ]
-    paths-ignore: [ "docs/**", "README*" ]
+    branches: ['master', 'main']
+    paths-ignore: ['docs/**', 'README*']
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
@@ -17,14 +17,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout Code Repository
         uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: "3.9"
+          python-version: '3.9'
           cache: pip
           cache-dependency-path: |
             requirements.txt
@@ -37,10 +36,10 @@ jobs:
       - name: Unit Test
         env:
           AWS_DEFAULT_REGION: ap-northeast-1
-          AWS_ACCOUNT_ID: "000000000000"
+          AWS_ACCOUNT_ID: '000000000000'
           AWS_ACCESS_KEY_ID: dummy-access-key
           AWS_SECRET_ACCESS_KEY: dummy-secret-key
-          AWS_ENDPOINT_URL: "http://localhost:4566"
+          AWS_ENDPOINT_URL: 'http://localhost:4566'
         run: |
           docker-compose -f docker-compose.ci.yml up -d
           make test
@@ -50,10 +49,10 @@ jobs:
       - name: E2E Test by localstack
         env:
           AWS_DEFAULT_REGION: ap-northeast-1
-          AWS_ACCOUNT_ID: "000000000000"
+          AWS_ACCOUNT_ID: '000000000000'
           AWS_ACCESS_KEY_ID: dummy-access-key
           AWS_SECRET_ACCESS_KEY: dummy-secret-key
-          AWS_ENDPOINT_URL: "http://localhost:4566"
+          AWS_ENDPOINT_URL: 'http://localhost:4566'
         run: |
           sed -i 's/aws /awslocal /g' ./deploy/deploy.sh
           make deploy_ci
