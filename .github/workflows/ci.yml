@@ -30,6 +30,14 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
       - name: Run pre-commit
         uses: pre-commit/action@v2.0.3
 
