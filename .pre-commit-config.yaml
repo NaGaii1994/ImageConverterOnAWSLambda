@@ -12,10 +12,10 @@ repos:
       - id: check-added-large-files
 
   - repo: https://github.com/awslabs/cfn-python-lint
-    rev: v0.15.0 # The version of cfn-lint to use
+    rev: v0.77.2 # The version of cfn-lint to use
     hooks:
-      - id: cfn-python-lint
-        files: cf/.*\.(json|yml|yaml)$
+      - id: cfn-lint
+        files: deploy/cloudformation/.*\.(json|yml|yaml)$
 
   - repo: https://github.com/asottile/pyupgrade
     rev: v2.37.3
