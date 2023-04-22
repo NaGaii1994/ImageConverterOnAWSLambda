@@ -1,31 +1,45 @@
-import { useState } from 'react';
+import { ChangeEvent, useRef, useState } from 'react';
 import './App.css';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg'; /* eslint-disable-line import/no-absolute-path */
 
 function App() {
-  const [count, setCount] = useState(0);
-
+  const inputFileReference = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | undefined>();
+  const onChangeFile = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setFile(event.target.files[0]);
+    }
+  };
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
+      <h1>Image Converter To WebP</h1>
       <div className="card">
-        <button onClick={() => setCount((previousCount) => previousCount + 1)} type="button">
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <form method="post" encType="multipart/form-data">
+          <input
+            onChange={onChangeFile}
+            ref={inputFileReference}
+            style={{ display: 'none' }}
+            type="file"
+            id="imageInput"
+            name="imageInput"
+            accept="image/png, image/jpeg, image/bmp, image/gif"
+          />
+          <button type="button" onClick={() => inputFileReference.current?.click()}>
+            {file ? 'Change Image' : 'Select Image'}
+          </button>
+          <button type="button" disabled={!file && true}>
+            Upload Image
+          </button>
+
+          {file ? (
+            <p>
+              You Select <code>{file?.name}</code> File
+            </p>
+          ) : (
+            <p>Please Select file.</p>
+          )}
+        </form>
       </div>
-      <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
+      <p className="read-the-docs">This application convert a image you upload to webp.</p>
     </div>
   );
 }
