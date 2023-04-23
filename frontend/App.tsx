@@ -1,3 +1,6 @@
+import { S3Client } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
+import { Credentials } from 'aws-sdk';
 import { ChangeEvent, useRef, useState } from 'react';
 import './App.css';
 
@@ -8,6 +11,22 @@ function App() {
     if (event.target.files && event.target.files[0]) {
       setFile(event.target.files[0]);
     }
+  };
+  const upload = async () => {
+    const creds = new Credentials(
+      import.meta.env.VITE_AWS_AccessID,
+      import.meta.env.VITE_AWS_SecretKey
+    );
+    const parallelUploads3 = new Upload({
+      client: new S3Client({ region: 'ap-northeast-1', credentials: creds }),
+      params: { Bucket: 'image-converter-image-storage-s3-bucket', Key: file?.name, Body: file },
+      leavePartsOnError: false,
+    });
+    parallelUploads3.on('httpUploadProgress', (progress) => {
+      console.log(progress);
+    });
+
+    await parallelUploads3.done();
   };
   return (
     <div className="App">
@@ -26,7 +45,7 @@ function App() {
           <button type="button" onClick={() => inputFileReference.current?.click()}>
             {file ? 'Change Image' : 'Select Image'}
           </button>
-          <button type="button" disabled={!file && true}>
+          <button type="button" disabled={!file && true} onClick={upload}>
             Upload Image
           </button>
 
