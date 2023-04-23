@@ -65,6 +65,14 @@ case $1 in
             EnvironmentType=${EnvironmentType} \
             --capabilities CAPABILITY_NAMED_IAM \
             --endpoint-url=http://localstack:4566
+
+        aws cloudformation deploy \
+            --stack-name ${StackNameOfFrontendIAMUser} \
+            --template-file ./cloudformation/frontend_iam_user.yml \
+            --parameter-overrides \
+            AppName=${AppName} \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --endpoint-url=http://localstack:4566
             ;;
     "ci")
         aws s3 mv \
@@ -80,6 +88,14 @@ case $1 in
             EnvironmentType=${EnvironmentType} \
             --capabilities CAPABILITY_NAMED_IAM \
             --endpoint-url=http://localhost:4566
+
+        aws cloudformation deploy \
+            --stack-name ${StackNameOfFrontendIAMUser} \
+            --template-file ./cloudformation/frontend_iam_user.yml \
+            --parameter-overrides \
+            AppName=${AppName} \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --endpoint-url=http://localhost:4566
             ;;
     "prod")
         aws s3 mv \
@@ -92,5 +108,12 @@ case $1 in
             --parameter-overrides \
             AppName=${AppName} \
             EnvironmentType=${EnvironmentType} \
+            --capabilities CAPABILITY_NAMED_IAM
+
+        aws cloudformation deploy \
+            --stack-name ${StackNameOfFrontendIAMUser} \
+            --template-file ./cloudformation/frontend_iam_user.yml \
+            --parameter-overrides \
+            AppName=${AppName} \
             --capabilities CAPABILITY_NAMED_IAM
 esac

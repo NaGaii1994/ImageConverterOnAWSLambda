@@ -80,6 +80,19 @@ Resources:
     DependsOn: 'ImageConverterLambdaFunctionPermission'
     Properties:
       BucketName: !Sub ${AppName}-image-storage-s3-bucket
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - HEAD
+              - GET
+              - POST
+              - PUT
+            AllowedOrigins:
+              - '*'
+            ExposedHeaders:
+              - 'ETAG'
       NotificationConfiguration:
         LambdaConfigurations:
           - Event: 's3:ObjectCreated:*'
