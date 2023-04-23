@@ -7,4 +7,10 @@ export default defineConfig({
   define: {
     global: 'window',
   },
+  build: {
+    commonjsOptions: { include: [] },
+  },
+  optimizeDeps: {
+    disabled: false,
+  },
 });
