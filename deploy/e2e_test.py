@@ -4,7 +4,20 @@ import time
 import boto3
 from boto3.s3.transfer import S3Transfer
 
-BUCKET_NAME = "s3-bucket-for-image-upload"
+config_file_name = "config"
+current_dir = os.path.dirname(__file__)
+config_file_path = os.path.join(current_dir, config_file_name)
+
+with open(config_file_path) as f:
+    for line in f:
+        if line.startswith("AppName="):
+            app_name = line.strip().split("=")[1]
+            app_name = app_name.strip('"')
+            break
+
+BUCKET_NAME = f"{app_name}-image-storage-s3-bucket"
+
+print(BUCKET_NAME)
 
 client = boto3.client("s3", endpoint_url=os.getenv("AWS_ENDPOINT_URL"))
 region_name = os.getenv("AWS_DEFAULT_REGION")

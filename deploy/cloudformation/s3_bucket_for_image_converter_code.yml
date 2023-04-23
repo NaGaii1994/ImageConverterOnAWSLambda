@@ -2,15 +2,17 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: S3 bucket for web services etc...
 
 Parameters:
-  NameOfLambdaCodeS3Bucket:
-    Description: Type of this BacketName.
+  AppName:
     Type: String
+    Default: 'image-converter'
+    Description: Enter the name of the application. Do not use underscores (_) or uppercase letters as this parameter is used for naming AWS resources.
+    AllowedPattern: (?=^.{3,63}$)(^[a-z0-9]+[a-z0-9\-]+[a-z0-9]+$)
 
 Resources:
   LambdaCodeS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub ${NameOfLambdaCodeS3Bucket}
+      BucketName: !Sub ${AppName}-lambda-code-s3-bucket
       AccessControl: Private
       PublicAccessBlockConfiguration:
         BlockPublicAcls: True

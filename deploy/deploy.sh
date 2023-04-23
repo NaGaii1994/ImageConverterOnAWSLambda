@@ -4,11 +4,6 @@ set -eu
 
 source ./config
 
-NameOfLambdaCodeS3Bucket="s3-bucket-for-lambda-deploy"
-
-NameOfImageStorageS3Bucket="s3-bucket-for-image-upload"
-NameOfImageConverterLambdaFunction="image-converter-lambda"
-
 if [ $# -ne 1 ]
 then
     echo "Usage: $0 local|ci|prod"
@@ -24,7 +19,7 @@ case $1 in
             --stack-name ${StackNameOfLambdaCodeS3Bucket} \
             --template-file ./cloudformation/s3_bucket_for_image_converter_code.yml \
             --parameter-overrides \
-            NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket} \
+            AppName=${AppName} \
             --endpoint-url=http://localstack:4566
         ;;
     "ci")
@@ -32,7 +27,7 @@ case $1 in
             --stack-name ${StackNameOfLambdaCodeS3Bucket} \
             --template-file ./cloudformation/s3_bucket_for_image_converter_code.yml \
             --parameter-overrides \
-            NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket} \
+            AppName=${AppName} \
             --endpoint-url=http://localhost:4566
         ;;
     "prod")
@@ -40,7 +35,7 @@ case $1 in
             --stack-name ${StackNameOfLambdaCodeS3Bucket} \
             --template-file ./cloudformation/s3_bucket_for_image_converter_code.yml \
             --parameter-overrides \
-            NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket}
+            AppName=${AppName}
         ;;
 esac
 cp -r ../lambda bootstrap
@@ -59,16 +54,14 @@ case $1 in
     "local")
         aws s3 mv \
             ./bootstrap.zip \
-            s3://${NameOfLambdaCodeS3Bucket}/bootstrap.zip \
+            s3://${AppName}-lambda-code-s3-bucket/bootstrap.zip \
             --endpoint-url=http://localstack:4566
 
         aws cloudformation deploy \
             --stack-name ${StackNameOfLambdaCode} \
             --template-file ./cloudformation/image_converter.yml \
             --parameter-overrides \
-            NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket} \
-            NameOfImageStorageS3Bucket=${NameOfImageStorageS3Bucket} \
-            NameOfImageConverterLambdaFunction=${NameOfImageConverterLambdaFunction} \
+            AppName=${AppName} \
             EnvironmentType=${EnvironmentType} \
             --capabilities CAPABILITY_NAMED_IAM \
             --endpoint-url=http://localstack:4566
@@ -76,16 +69,14 @@ case $1 in
     "ci")
         aws s3 mv \
             ./bootstrap.zip \
-            s3://${NameOfLambdaCodeS3Bucket}/bootstrap.zip \
+            s3://${AppName}-lambda-code-s3-bucket/bootstrap.zip \
             --endpoint-url=http://localhost:4566
 
         aws cloudformation deploy \
             --stack-name ${StackNameOfLambdaCode} \
             --template-file ./cloudformation/image_converter.yml \
             --parameter-overrides \
-            NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket} \
-            NameOfImageStorageS3Bucket=${NameOfImageStorageS3Bucket} \
-            NameOfImageConverterLambdaFunction=${NameOfImageConverterLambdaFunction} \
+            AppName=${AppName} \
             EnvironmentType=${EnvironmentType} \
             --capabilities CAPABILITY_NAMED_IAM \
             --endpoint-url=http://localhost:4566
@@ -93,15 +84,13 @@ case $1 in
     "prod")
         aws s3 mv \
             ./bootstrap.zip \
-            s3://${NameOfLambdaCodeS3Bucket}/bootstrap.zip
+            s3://${AppName}-lambda-code-s3-bucket/bootstrap.zip
 
         aws cloudformation deploy \
             --stack-name ${StackNameOfLambdaCode} \
             --template-file ./cloudformation/image_converter.yml \
             --parameter-overrides \
-            NameOfLambdaCodeS3Bucket=${NameOfLambdaCodeS3Bucket} \
-            NameOfImageStorageS3Bucket=${NameOfImageStorageS3Bucket} \
-            NameOfImageConverterLambdaFunction=${NameOfImageConverterLambdaFunction} \
+            AppName=${AppName} \
             EnvironmentType=${EnvironmentType} \
             --capabilities CAPABILITY_NAMED_IAM
 esac
