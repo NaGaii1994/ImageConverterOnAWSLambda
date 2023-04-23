@@ -1,17 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'This cloudformation code creates an S3 bucket that is used to store images. It also provisions a Lambda function that is triggered by an image upload event and is responsible for converting the images.'
 Parameters:
-  NameOfLambdaCodeS3Bucket:
-    Description: Name of the S3 bucket used to upload lambda function as zip.
+  AppName:
     Type: String
-
-  NameOfImageStorageS3Bucket:
-    Description: Name of the S3 bucket used to upload images and trigger a Lambda function that processes them.
-    Type: String
-
-  NameOfImageConverterLambdaFunction:
-    Description: Name of the lambda function converting images.
-    Type: String
+    Default: 'image-converter'
+    Description: Enter the name of the application. Do not use underscores (_) or uppercase letters as this parameter is used for naming AWS resources.
+    AllowedPattern: (?=^.{3,63}$)(^[a-z0-9]+[a-z0-9\-]+[a-z0-9]+$)
 
   EnvironmentType:
     Description: The environment type
@@ -48,15 +42,15 @@ Resources:
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
         - 'arn:aws:iam::aws:policy/CloudWatchLogsFullAccess'
-      RoleName: 'image_converter_lambda_function_role'
+      RoleName: !Sub ${AppName}-image-converter-lambda-function-role
 
   ImageConverterLambdaFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
       Code:
-        S3Bucket: !Sub ${NameOfLambdaCodeS3Bucket}
+        S3Bucket: !Sub ${AppName}-lambda-code-s3-bucket
         S3Key: 'bootstrap.zip'
-      FunctionName: !Sub ${NameOfImageConverterLambdaFunction}
+      FunctionName: !Sub ${AppName}-image-converter-lambda-function
       Handler: 'main.lambda_handler'
       MemorySize: 128
       Role: !GetAtt 'ImageConverterLambdaFunctionRole.Arn'
@@ -64,7 +58,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          IMAGE_STORAGE_S3_BUCKET: !Sub ${NameOfImageStorageS3Bucket}
+          IMAGE_STORAGE_S3_BUCKET: !Sub ${AppName}-image-storage-s3-bucket
           AWS_ENDPOINT_URL:
             !FindInMap [ImageConverterLambdaFunctionMap, !Ref EnvironmentType, AwsEndPointUrl]
 
@@ -79,13 +73,13 @@ Resources:
       SourceArn: !Join
         - ''
         - - 'arn:aws:s3:::'
-          - !Sub ${NameOfImageStorageS3Bucket}
+          - !Sub ${AppName}-image-storage-s3-bucket
 
   ImageStorageS3Bucket:
     Type: 'AWS::S3::Bucket'
     DependsOn: 'ImageConverterLambdaFunctionPermission'
     Properties:
-      BucketName: !Sub ${NameOfImageStorageS3Bucket}
+      BucketName: !Sub ${AppName}-image-storage-s3-bucket
       NotificationConfiguration:
         LambdaConfigurations:
           - Event: 's3:ObjectCreated:*'
