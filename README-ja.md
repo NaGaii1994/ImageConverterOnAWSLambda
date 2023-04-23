@@ -19,12 +19,28 @@
 - aws-cli (deploy スクリプトをホスト OS で実行する場合)
 - pip (deploy スクリプトをホスト OS で実行する場合)
 
-## AWS 実環境におけるデプロイ
+## localstack に対するデプロイ
+
+devcontainer 内で実行して下さい。
+
+```
+make deploy_local
+```
+
+## localstack を用いた E2ETest
+
+devcontainer 内で実行して下さい。
+
+```
+make e2e_test_local
+```
+
+## AWS 実環境に対するデプロイ
 
 ホスト OS で実行して下さい。
 
 ```
-make deploy
+make deploy_prod
 ```
 
 ## 開発
@@ -39,7 +55,7 @@ make deploy
 
 2. vscode が起動したら、Reopen container を選択して、devcontainer 内で開発して下さい。
 
-## Test
+## ユニットテスト
 
 ImageConverterLambdaFunction 内で実行される python コードをテストします。
 `make test`

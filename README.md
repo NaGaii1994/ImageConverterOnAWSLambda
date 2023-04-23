@@ -21,12 +21,28 @@ This App provisions the necessary AWS resources to enable automatic conversion o
 - aws-cli (For execute deploy command on your host machine)
 - pip (For execute deploy command on your host machine)
 
-## Deploy
+## Deploy to localstack
 
-on your host machine(not on container)
+on devcontainer
 
 ```
-make deploy
+make deploy_local
+```
+
+## E2E Test by localstack
+
+on devcontainer
+
+```
+make e2e_test_local
+```
+
+## Deploy to aws
+
+on your host machine
+
+```
+make deploy_prod
 ```
 
 ## Develop
@@ -41,7 +57,7 @@ make deploy
 
 2. When open vscode, please select "Reopne in container".
 
-## Test
+## Unit Test
 
 Test the python code of the image converter using localstack.
 `make test`
