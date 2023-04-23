@@ -9,6 +9,9 @@ deploy_ci:
 deploy_prod:
 	cd deploy && ./deploy.sh prod
 
+e2e_test_local:
+	python ./deploy/e2e_test.py
+
 delete:
 	cd deploy && ./delete.sh
 
