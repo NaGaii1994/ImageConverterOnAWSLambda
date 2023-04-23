@@ -13,3 +13,6 @@ aws cloudformation delete-stack \
 
 aws cloudformation delete-stack \
     --stack-name ${StackNameOfLambdaCode}
+
+aws cloudformation delete-stack \
+    --stack-name ${StackNameOfFrontendIAMUser}

@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'This cloudformation code creates an S3 bucket that is used to store images. It also provisions a Lambda function that is triggered by an image upload event and is responsible for converting the images.'
+Parameters:
+  AppName:
+    Type: String
+    Default: 'image-converter'
+    Description: Enter the name of the application. Do not use underscores (_) or uppercase letters as this parameter is used for naming AWS resources.
+    AllowedPattern: (?=^.{3,63}$)(^[a-z0-9]+[a-z0-9\-]+[a-z0-9]+$)
+Resources:
+  FrontEndIAMUser:
+    Type: AWS::IAM::User
+    Properties:
+      Path: /
+      UserName: !Sub ${AppName}-frontend-iam-user
+      Policies:
+        - PolicyName: !Sub ${AppName}-frontend-iam-user-policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                Resource:
+                  - !Sub arn:aws:s3:::${AppName}-image-storage-s3-bucket/*
+
+  FrontEndIAMAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref FrontEndIAMUser
+
+Outputs:
+  FrontEndAccessID:
+    Value: !Ref FrontEndIAMAccessKey
+  FrontEndAccessKey:
+    Value: !GetAtt FrontEndIAMAccessKey.SecretAccessKey

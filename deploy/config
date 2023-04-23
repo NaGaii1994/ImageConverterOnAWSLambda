@@ -1,3 +1,4 @@
 StackNameOfLambdaCodeS3Bucket="stack-for-s3-bucket-for-lambda-deploy"
 StackNameOfLambdaCode="stack-for-image-converter"
+StackNameOfFrontendIAMUser="stack-for-frontend-iam-user"
 AppName="image-converter"
