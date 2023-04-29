@@ -73,6 +73,19 @@ case $1 in
             AppName=${AppName} \
             --capabilities CAPABILITY_NAMED_IAM \
             --endpoint-url=http://localstack:4566
+
+        # Localstack pro only support cloudformation
+
+        # aws cloudformation deploy \
+        #     --stack-name ${StackNameOfFrontend} \
+        #     --template-file ./cloudformation/frontend_hosting.yml \
+        #     --parameter-overrides \
+        #     AppName=${AppName} \
+        #     --endpoint-url=http://localstack:4566
+
+        # aws s3 cp ./../dist s3://${AppName}-frontend-hosting-s3-bucket/ \
+        #     --recursive \
+        #     --endpoint-url=http://localstack:4566
             ;;
     "ci")
         aws s3 mv \
@@ -96,6 +109,19 @@ case $1 in
             AppName=${AppName} \
             --capabilities CAPABILITY_NAMED_IAM \
             --endpoint-url=http://localhost:4566
+
+        # Localstack pro only support cloudformation
+
+        # aws cloudformation deploy \
+        #     --stack-name ${StackNameOfFrontend} \
+        #     --template-file ./cloudformation/frontend_hosting.yml \
+        #     --parameter-overrides \
+        #     AppName=${AppName} \
+        #     --endpoint-url=http://localhost:4566
+
+        # aws s3 cp ./../dist s3://${AppName}-frontend-hosting-s3-bucket/ \
+        #     --recursive \
+        #     --endpoint-url=http://localhost:4566
             ;;
     "prod")
         aws s3 mv \
@@ -116,4 +142,12 @@ case $1 in
             --parameter-overrides \
             AppName=${AppName} \
             --capabilities CAPABILITY_NAMED_IAM
+
+        aws cloudformation deploy \
+            --stack-name ${StackNameOfFrontend} \
+            --template-file ./cloudformation/frontend_hosting.yml \
+            --parameter-overrides \
+            AppName=${AppName}
+
+        aws s3 cp ./../dist s3://${AppName}-frontend-hosting-s3-bucket/ --recursive
 esac

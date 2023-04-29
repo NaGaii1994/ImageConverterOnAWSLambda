@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'This cloudformation code creates an S3 bucket that is used to store images. It also provisions a Lambda function that is triggered by an image upload event and is responsible for converting the images.'
+Parameters:
+  AppName:
+    Type: String
+    Default: 'image-converter'
+    Description: Enter the name of the application. Do not use underscores (_) or uppercase letters as this parameter is used for naming AWS resources.
+    AllowedPattern: (?=^.{3,63}$)(^[a-z0-9]+[a-z0-9\-]+[a-z0-9]+$)
+
+Resources:
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub ${AppName}-frontend-hosting-s3-bucket
+      AccessControl: Private
+
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 'cloudfront.amazonaws.com'
+            Action: 's3:GetObject'
+            Resource: !Sub 'arn:aws:s3:::${S3Bucket}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - S3Bucket
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !Sub '${S3Bucket}.s3.${AWS::Region}.amazonaws.com'
+            Id: !Sub ${AppName}-frontend-hosting
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+            OriginAccessControlId: !GetAtt CloudFrontOriginAccessControl.Id
+        Enabled: 'true'
+        DefaultRootObject: index.html
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+        HttpVersion: http2
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+          MinimumProtocolVersion: TLSv1.2_2021
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - DELETE
+            - GET
+            - HEAD
+            - OPTIONS
+            - PATCH
+            - POST
+            - PUT
+          Compress: true
+          TargetOriginId: !Sub ${AppName}-frontend-hosting
+          ForwardedValues:
+            QueryString: 'false'
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: redirect-to-https
+
+  CloudFrontOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Description: !Sub origin access control(OAC) for allowing cloudfront to access ${AppName} frontend S3 bucket
+        Name: !Sub ${AppName}-frontend-hosting-origin-access-control
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
