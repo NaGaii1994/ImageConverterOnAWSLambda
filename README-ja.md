@@ -10,6 +10,8 @@
 - ImageConverterLambdaFunction という名前の Lambda 関数。この関数は、画像が ImageStorageS3Bucket バケットにアップロードされると、S3 イベントによってトリガーされます。この関数は、アップロードされた画像を PIL を使って WebP 形式に変換し、ImageStorageS3Bucket バケットのアップロードされた画像と同じディレクトリに保存します。
 - LambdaCodeS3Bucket という S3 バケット。ImageConverterLambdaFunction の Lambda 関数コードを格納するために使用されます。
 
+![Stages of container-based development, from development to deployment](images/ImageConverterOnAWSLambda.png)
+
 ## 必須ソフトウェア
 
 - docker
